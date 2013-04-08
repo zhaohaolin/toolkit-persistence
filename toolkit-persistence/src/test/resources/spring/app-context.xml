@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/task 
+    http://www.springframework.org/schema/task/spring-task.xsd"
+	default-autowire="default">
+
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:config.properties</value>
+				<value>classpath:jdbc.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- ebean config -->
+	<bean id="ebeanServerConfig" class="com.avaje.ebean.config.ServerConfig">
+		<property name="dataSource" ref="dataSource" />
+		<property name="name" value="mysql" />
+		<property name="defaultServer" value="true" />
+		<property name="loggingDirectory" value="logs" />
+		<property name="loggingLevel" value="NONE" />
+		<property name="debugSql" value="false" />
+		<property name="ddlGenerate" value="false" />
+		<property name="ddlRun" value="false" />
+		<property name="autofetchConfig">
+			<bean class="com.avaje.ebean.config.AutofetchConfig">
+				<property name="logDirectory" value="logs" />
+			</bean>
+		</property>
+		<property name="externalTransactionManager">
+			<bean
+				class="com.avaje.ebean.springsupport.txn.SpringAwareJdbcTransactionManager" />
+		</property>
+		<property name="namingConvention">
+			<bean class="com.avaje.ebean.config.UnderscoreNamingConvention" />
+		</property>
+		<property name="classes">
+			<bean class="org.common.persistence.ModelUtils" factory-method="scanModelPackage">
+				<constructor-arg>
+					<set>
+						<value>com.globe.tkz.domain.entity.*</value>
+					</set>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="ebeanServer"
+		class="com.avaje.ebean.springsupport.factory.EbeanServerFactoryBean">
+		<property name="serverConfig" ref="ebeanServerConfig" />
+	</bean>
+
+</beans>
